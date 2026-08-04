@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swag, The Upstart Way</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Instrument+Serif:ital@0;1&display=swap');
+
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #f7fafa;
+    color: #222929;
+  }
+
+  /* Instrument Serif used sparingly for high-impact display moments only — Figtree stays
+     default for everything utilitarian, per the brand's own type-pairing philosophy. Note:
+     this is a free-font stand-in for Forrest's editorial warmth, not the licensed brand typeface.
+     Instrument Serif only ships in one weight, so size/spacing (not weight) carry the emphasis. */
+  .hero h1, .section h2 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+  }
+
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+    background: #fff;
+    border-top: 5px solid #00B1AC;
+    position: relative;
+    isolation: isolate;
+  }
+  /* Subtle grain texture per brand pattern guidance — lightweight, uniform, low opacity */
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .page > * { position: relative; z-index: 1; }
+
+  /* Topbar */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 36px;
+    border-bottom: 1px solid #eaecf0;
+  }
+  .topbar span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 48px 36px 36px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 68px;
+    letter-spacing: -0.5px;
+    color: #222929;
+    line-height: 1.05;
+  }
+  .hero p.tagline {
+    max-width: 460px;
+    margin: 22px auto 0;
+    font-size: 16px;
+    font-weight: 400;
+    color: #4b5563;
+    line-height: 1.65;
+  }
+  .hero p.tagline strong {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-size: 20px;
+    color: #00807B;
+  }
+  .hero-img {
+    max-width: 620px;
+    margin: 26px auto 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #eaecf0;
+  }
+  .hero-img img { width: 100%; display: block; }
+
+  .divider {
+    height: 1px;
+    background: #eaecf0;
+    margin: 0 36px;
+  }
+
+  /* Section headers */
+  .section {
+    padding: 40px 36px;
+  }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #00B1AC;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-size: 38px;
+    color: #222929;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .section .section-sub {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    max-width: 460px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+
+  /* Principles */
+  .principle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+  .principle-card {
+    border: 1px solid #eaecf0;
+    border-radius: 14px;
+    padding: 22px 16px;
+    text-align: center;
+    background: #fafbfc;
+  }
+  .principle-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .principle-icon svg { width: 34px; height: 34px; stroke: #00B1AC; }
+  .principle-card h3 {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #222929;
+    margin-bottom: 6px;
+  }
+  .principle-card p {
+    font-size: 12.5px;
+    color: #6b7280;
+    line-height: 1.55;
+  }
+
+  /* Brilliant banner */
+  .brilliant-banner {
+    margin-top: 26px;
+    background: #EFFAFB;
+    border: 1.5px solid #00B1AC;
+    border-radius: 10px;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 13.5px;
+    color: #222929;
+    line-height: 1.6;
+  }
+  .brilliant-banner a { color: #00807B; font-weight: 700; text-decoration: none; }
+  .brilliant-banner a:hover { text-decoration: underline; }
+
+  /* Process steps (reused pattern) */
+  .steps { display: flex; flex-direction: column; }
+  .step { display: flex; }
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 52px;
+    flex-shrink: 0;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #00B1AC;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-line { width: 2px; background: #C1E9E7; flex: 1; min-height: 20px; }
+  .step:last-child .step-line { display: none; }
+  .step-body {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    margin-left: 16px;
+    flex: 1;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #eaecf0;
+  }
+  .step-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #222929;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-title .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .step-desc { font-size: 13.5px; color: #4b5563; line-height: 1.65; }
+  .step-desc ul { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+  .step-desc li { font-size: 13px; color: #4b5563; }
+
+  .callout { margin-top: 12px; border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.55; }
+  .callout.teal { background: #EFFAFB; border-left: 3px solid #00B1AC; color: #222929; }
+  .callout.orange { background: #fff7ed; border-left: 3px solid #f97316; color: #222929; }
+  .callout.slate { background: #f1f5f9; border-left: 3px solid #94a3b8; color: #222929; }
+
+  .zip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .zip-box { border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.55; }
+  .zip-box.green { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .zip-box.orange { background: #fff7ed; border: 1px solid #fed7aa; }
+  .zip-box .zip-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .zip-box.green .zip-label { color: #16a34a; }
+  .zip-box.orange .zip-label { color: #c2410c; }
+
+  .zip-walkthrough { margin-top: 14px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+  .zip-walkthrough-header {
+    background: #f8fafc; padding: 10px 14px; font-size: 11px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0;
+  }
+  .zip-form-steps { display: flex; flex-direction: column; }
+  .zip-form-step { display: flex; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; align-items: flex-start; }
+  .zip-form-step:last-child { border-bottom: none; }
+  .zip-form-badge { background: #222929; color: #fff; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 3px 8px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .zip-form-content { flex: 1; }
+  .zip-form-title { font-size: 13px; font-weight: 700; color: #222929; margin-bottom: 4px; }
+  .zip-form-fields { font-size: 12px; color: #6b7280; line-height: 1.6; }
+  .zip-form-fields span { display: inline-block; background: #f1f5f9; border-radius: 4px; padding: 1px 6px; margin: 2px 2px 2px 0; font-size: 11.5px; color: #374151; }
+
+  /* Timing + contacts */
+  .info-card {
+    background: #fff; border-radius: 14px; padding: 24px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #eaecf0; margin-top: 20px;
+  }
+  .info-card h3 {
+    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #00B1AC; margin-bottom: 16px;
+  }
+  .timing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .timing-item { text-align: center; background: #f8fafc; border-radius: 10px; padding: 16px 12px; border: 1px solid #eaecf0; }
+  .timing-item .t-num { font-size: 22px; font-weight: 700; color: #00B1AC; line-height: 1; margin-bottom: 4px; }
+  .timing-item .t-label { font-size: 12px; color: #6b7280; line-height: 1.4; }
+
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .contact-item { font-size: 13px; color: #4b5563; line-height: 1.5; }
+  .contact-item strong { display: block; color: #222929; font-size: 12px; font-weight: 700; margin-bottom: 1px; }
+  .contact-item a { color: #00B1AC; text-decoration: none; }
+  .contact-item a:hover { text-decoration: underline; }
+
+  a { color: #00B1AC; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <span>Upstart Swag Guide</span>
+    <span>The People Team</span>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Swag, The Upstart Way</h1>
+    <p class="tagline"><strong>Thoughtful. Curated.</strong> At Upstart, swag isn't just "stuff." It reflects the same intention, quality, and care we bring to everything we build.</p>
+    <div class="hero-img">
+      <img src="swag-hero.png" alt="Upstart branded sweatshirt and water bottle">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Design Principles -->
+  <div class="section">
+    <div class="section-eyebrow">What We Look For</div>
+    <h2>Swag Design Principles</h2>
+    <p class="section-sub">Before you browse, use these three principles to guide what you pick.</p>
+
+    <div class="principle-grid">
+      <div class="principle-card">
+        <div class="principle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="4.3" r="1.5"/>
+            <path d="M12 5.8V7.8L4 16.3a1.3 1.3 0 0 0 .95 2.2h14.1a1.3 1.3 0 0 0 .95-2.2L12 7.8"/>
+          </svg>
+        </div>
+        <h3>Premium Apparel</h3>
+        <p>Quality fabrics and fits people actually want to wear again.</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9.5" cy="9.5" r="6"/>
+            <rect x="10.5" y="10.5" width="10.5" height="10.5" rx="2"/>
+          </svg>
+        </div>
+        <h3>Clean Design</h3>
+        <p>Minimal branding and thoughtful logo placement, not logo soup.</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8.5 3.5a5.5 5.5 0 0 0 1.28 8.9l-6.2 6.2a1.9 1.9 0 0 0 2.68 2.68l6.2-6.2a5.5 5.5 0 0 0 7.4-7.4l-3.4 3.4-2.3-.75-.75-2.3 3.4-3.4a5.5 5.5 0 0 0-8.11 1.87z"/>
+          </svg>
+        </div>
+        <h3>Practical Utility</h3>
+        <p>Useful in daily life, not something that ends up in a drawer.</p>
+      </div>
+    </div>
+
+    <div class="brilliant-banner">
+      We partner with <a href="https://app.brilliantmade.com" target="_blank">Brilliant</a> to make sure every piece of swag we order consistently aligns to these principles.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Process -->
+  <div class="section">
+    <div class="section-eyebrow">Step By Step</div>
+    <h2>The Full Process</h2>
+    <p class="section-sub">Start by defining who this swag is for and what you want it to convey — then work through the steps below. Plan ahead: the full process typically takes 4–6 weeks.</p>
+
+    <div class="steps">
+
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Get Budget Approval</div>
+          <div class="step-desc">
+            Align with your Director before proceeding — and your VP as well, in some cases.
+            <ul>
+              <li>Confirm swag fits within the overall onsite per-person budget</li>
+              <li>Coordinate with your EA team if applicable</li>
+            </ul>
+            <div class="callout teal">
+              <strong>Budget guidance:</strong> Total onsite budget is $200/person. Swag is recommended at $25–$40/person. Minimum order quantity is typically 25 units.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Browse &amp; Select Swag</div>
+          <div class="step-desc">
+            Review <a href="https://app.brilliantmade.com/lookbooks/16018" target="_blank">Brilliant's lookbook</a> for current options. Add your item to your cart, confirm quantity, and enter shipping info to generate an estimate.
+            <div class="callout slate">
+              <strong>Custom design?</strong> If your idea isn't in the lookbook, submit a request through the <a href="https://upstartnetwork.atlassian.net/servicedesk/customer/portal/26" target="_blank"><strong>Creative Design Service Desk</strong></a> before proceeding. Brand approval is required, and custom artwork may add cost.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Initiate Order with Brilliant</div>
+          <div class="step-desc">
+            Email <a href="mailto:upstart@brilliantmade.com">upstart@brilliantmade.com</a> to kick off your order. Include:
+            <ul>
+              <li>Project overview (audience, goals, gifting purpose)</li>
+              <li>Budget, quantity, and sizes (if applicable)</li>
+              <li>Delivery date and delivery address(es)</li>
+              <li>If shipping to individuals: gather recipient addresses using <a href="https://docs.google.com/forms/d/1b3G1XcYWVegcMgEpzCGtkPhY7gddhi3YRFPRejueOqY/viewform?edit_requested=true&ts=60635fb4" target="_blank">this template</a> and confirm mailing consent</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Review Your Order</div>
+          <div class="step-desc">
+            Brilliant will reach out to confirm your order and include a link to review and approve or edit your artwork.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Get Procurement Approval via Zip <span class="tag">Required</span></div>
+          <div class="step-desc">
+            The approval path depends on your quote amount:
+            <div class="zip-grid">
+              <div class="zip-box orange">
+                <div class="zip-label">Quote &gt; $1,000</div>
+                Submit a <strong>Zip Fastrack ticket</strong> and attach the quote. Zip is first-come, first-served — submit early.<br><br>
+                Questions: <a href="mailto:procurement@upstart.com">procurement@upstart.com</a>
+              </div>
+              <div class="zip-box green">
+                <div class="zip-label">Quote &lt; $1,000</div>
+                No Zip ticket needed. Get <strong>VP approval via email</strong>, then send the invoice &amp; approval to <a href="mailto:bills@upstart.com">bills@upstart.com</a>.
+              </div>
+            </div>
+
+            <div class="zip-walkthrough">
+              <div class="zip-walkthrough-header">How to submit a Zip Fastrack ticket — go to <a href="https://upstart.zip.com" target="_blank" style="color:#00B1AC;">upstart.zip.com</a> → New Request → Fastrack Purchase Request (Limited Categories)</div>
+              <div class="zip-form-steps">
+                <div class="zip-form-step">
+                  <div class="zip-form-badge">Page 1</div>
+                  <div class="zip-form-content">
+                    <div class="zip-form-title">General Information</div>
+                    <div class="zip-form-fields">Check the acknowledgement box · Select <span>Yes</span> for contract/proposal received · Search category: <span>Swag</span> · Request type: <span>New Contract</span> · Department: <span>select your department</span> · Subsidiary: <span>Upstart Network, Inc. or Upstart Mortgage</span> · Name the request (e.g. <em>"Swag for team event"</em>) · Add a brief description of the purchase</div>
+                  </div>
+                </div>
+                <div class="zip-form-step">
+                  <div class="zip-form-badge">Page 2</div>
+                  <div class="zip-form-content">
+                    <div class="zip-form-title">Vendor Details</div>
+                    <div class="zip-form-fields">Search for <span>Brilliant</span> — they're already a preferred vendor · Select your Brilliant contact (e.g. Claire Morrison, Senior Account Manager) · San Mateo office access: <span>No</span></div>
+                  </div>
+                </div>
+                <div class="zip-form-step">
+                  <div class="zip-form-badge">Page 3</div>
+                  <div class="zip-form-content">
+                    <div class="zip-form-title">Contract Details</div>
+                    <div class="zip-form-fields">Enter estimated total value (note: Fastrack cannot be used for contracts over <strong>$200K</strong>) · Payment type: <span>One-time payment</span> · Enter service start and end dates · Set contract signature needed-by date</div>
+                  </div>
+                </div>
+                <div class="zip-form-step">
+                  <div class="zip-form-badge">Page 4</div>
+                  <div class="zip-form-content">
+                    <div class="zip-form-title">Documents</div>
+                    <div class="zip-form-fields">Upload the vendor quote/proposal (required) · Attach any additional reference files · Click <strong>Submit request</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="callout orange">
+              Reference the <a href="https://app.getguru.com/card/cnA76dqi/Upstart-Procurement-Policy-and-Procedures" target="_blank">Procurement Policy</a> for full details.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">6</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Approve Order in Brilliant</div>
+          <div class="step-desc">
+            Once procurement approves, go to your Brilliant dashboard, select your estimate, and click <strong>Approve</strong>.
+            <div class="callout teal">
+              <strong>Payment always goes through AP — never via credit card.</strong> Brilliant will contact the AP team directly. All invoices must be sent to <a href="mailto:bills@upstart.com">bills@upstart.com</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step">
+        <div class="step-left"><div class="step-num">7</div></div>
+        <div class="step-body">
+          <div class="step-title">Production &amp; Shipping 🎉</div>
+          <div class="step-desc">
+            Brilliant begins production once payment is confirmed and ships directly to your submitted address(es). Brilliant's inventory isn't guaranteed until the estimate is approved, so don't delay.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Timing -->
+    <div class="info-card">
+      <h3>Plan-Ahead Guide</h3>
+      <div class="timing-grid">
+        <div class="timing-item"><div class="t-num">3–4 wks</div><div class="t-label">Batch order to office or event</div></div>
+        <div class="timing-item"><div class="t-num">4–6 wks</div><div class="t-label">Individual kits shipped to recipients</div></div>
+        <div class="timing-item"><div class="t-num">+Time</div><div class="t-label">Q4 orders &amp; rush requests — plan extra buffer</div></div>
+      </div>
+    </div>
+
+    <!-- Contacts -->
+    <div class="info-card">
+      <h3>Key Contacts</h3>
+      <div class="contact-grid">
+        <div class="contact-item"><strong>Swag Orders (Brilliant)</strong><a href="mailto:upstart@brilliantmade.com">upstart@brilliantmade.com</a></div>
+        <div class="contact-item"><strong>Budget Approval</strong>Your Director (VP in some cases)</div>
+        <div class="contact-item"><strong>Invoices &amp; Payment (AP)</strong><a href="mailto:bills@upstart.com">bills@upstart.com</a></div>
+        <div class="contact-item"><strong>Zip / Procurement</strong><a href="mailto:procurement@upstart.com">procurement@upstart.com</a></div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+</body>
+</html>
